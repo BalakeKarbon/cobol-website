@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>COBOL Website</title>
+</head>
+<body>
+	<noscript>
+		Oh so your a cool kid? No javascript? U on a microwave or something?
+	</noscript>
+	<script src="main.js"></script>
+	<script>
+		Module['onRuntimeInitialized'] = function() {
+			//console.log("wasm loaded ");
+			Module.ccall ("cob_init", null, [], []);
+			Module.ccall ("MAIN", null, [], []);
+    		}
+	</script>
+</body>
+</html>
