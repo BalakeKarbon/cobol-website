@@ -1,2 +1,2 @@
 # cobol-website
-Wrappers to allow writing a website in almost entirely COBOL and an example website.
+An entire website written in COBOL fixed format using the CobDOMinate HTML DOM library.
