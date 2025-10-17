@@ -46,134 +46,131 @@
 004600 SET-ACTIVE-FLAG.
 004700   IF WS-LANG = 'us' THEN
 004800     CALL 'cobdom_style' USING 'langES', 'display', 'none'
-004900      
-005000   ELSE
-005100     CALL 'cobdom_style' USING 'langUS', 'display', 'none'
-005200      
-005300   END-IF.
-005400   CONTINUE.
-005500 BUILD-MENUBAR.
-005600   CALL 'cobdom_create_element' USING 'menuDiv', 'div'.
-005700   CALL 'cobdom_style' USING 'menuDiv', 'position', 'fixed'.
-005800   CALL 'cobdom_style' USING 'menuDiv', 'display', 'flex'.
-005900   CALL 'cobdom_style' USING 'menuDiv', 'justifyContent', 
-006000     'space-between'.
-006100   CALL 'cobdom_style' USING 'menuDiv', 'top', '0'.
-006200   CALL 'cobdom_style' USING 'menuDiv', 'left', '0'.
-006300   CALL 'cobdom_style' USING 'menuDiv', 'width', '100%'.
-006400   CALL 'cobdom_style' USING 'menuDiv', 'backgroundColor',
-006500     '#919191'.
-006600   CALL 'cobdom_inner_html' USING 'menuDiv', 'Menu'.
-006700   CALL 'cobdom_append_child' USING 'menuDiv', 'body'.
-006800*Setup language selector
-006900   CALL 'cobdom_create_element' USING 'langSelector', 'span'.
-007000   CALL 'cobdom_style' USING 'langSelector', 'marginLeft', 'auto'.
-007100   CALL 'cobdom_create_element' USING 'langUS', 'img'.
-007200   CALL 'cobdom_create_element' USING 'langES', 'img'.
-007300   CALL 'cobdom_src' USING 'langUS', '/res/icons/us.svg'.
-007400   CALL 'cobdom_style' USING 'langUS', 'width', '3rem'.
-007500   CALL 'cobdom_style' USING 'langUS', 'height', '3rem'.
-007600   CALL 'cobdom_src' USING 'langES', '/res/icons/es.svg'.
-007700   CALL 'cobdom_style' USING 'langES', 'width', '3rem'.
-007800   CALL 'cobdom_style' USING 'langES', 'height', '3rem'.
-007900   CALL 'cobdom_append_child' USING 'langUS', 'langSelector'.
-008000   CALL 'cobdom_add_event_listener' USING 'langUS', 'click', 
-008100     'SETLANGUS'.
-008200   CALL 'cobdom_append_child' USING 'langES', 'langSelector'.
-008300   CALL 'cobdom_add_event_listener' USING 'langES', 'click', 
-008400     'SETLANGES'.
-008500   CALL 'cobdom_append_child' USING 'langSelector', 'menuDiv'.
-008600   CONTINUE.
-008700 LANG-CHECK.
-008800   CALL 'cobdom_get_cookie' USING BY REFERENCE WS-LANG,
-008900     'lang'.
-009000   IF WS-LANG = WS-NULL-BYTE THEN
-009100     CALL 'cobdom_set_cookie' USING 'us', 'lang'
-009200      
-009300     MOVE 'us' TO WS-LANG
-009400   END-IF.
-009500   PERFORM SET-ACTIVE-FLAG.
-009600   CONTINUE.
-009700 COOKIE-ASK.
-009800   CALL 'cobdom_create_element' USING 'cookieDiv', 'div'.
-009900   CALL 'cobdom_style' USING 'cookieDiv', 'position', 'fixed'.
-010000   CALL 'cobdom_style' USING 'cookieDiv', 'bottom', '0'.
-010100   CALL 'cobdom_style' USING 'cookieDiv', 'left', '0'.
-010200   CALL 'cobdom_style' USING 'cookieDiv', 'width', '100%'.
-010300   CALL 'cobdom_style' USING 'cookieDiv', 'backgroundColor', 
-010400     '#00ff00'.
-010500   CALL 'cobdom_style' USING 'cookieDiv', 'textAlign', 
-010600     'center'.
-010700   CALL 'cobdom_inner_html' USING 'cookieDiv','Would you like to a
-010800-'llow cookies to store your preferences such as language?&nbsp;'.
-010900   CALL 'cobdom_create_element' USING 'cookieYes', 'span'.
-011000   CALL 'cobdom_set_class' USING 'cookieYes', 'cookieButton'.
-011100   CALL 'cobdom_inner_html' USING 'cookieYes', 'Yes&nbsp;'.
-011200   CALL 'cobdom_create_element' USING 'cookieNo', 'span'.
-011300   CALL 'cobdom_set_class' USING 'cookieNo', 'cookieButton'.
-011400   CALL 'cobdom_inner_html' USING 'cookieNo', 'No'.
-011500   CALL 'cobdom_add_event_listener' USING 'cookieYes', 'click',
-011600     'COOKIEACCEPT'.
-011700   CALL 'cobdom_add_event_listener' USING 'cookieNo', 'click',
-011800     'COOKIEDENY'.
-011900   CALL 'cobdom_append_child' USING 'cookieYes', 'cookieDiv'.
-012000   CALL 'cobdom_append_child' USING 'cookieNo', 'cookieDiv'.
-012100   CALL 'cobdom_append_child' USING 'cookieDiv', 'body'.
-012200*Note this must be called after the elements are added to the
-012300*document because it must search for them.
-012400   CALL 'cobdom_class_style' USING 'cookieButton', 
-012500     'backgroundColor', '#ff0000'.
-012600   CONTINUE.
-012700 COOKIEACCEPT SECTION.
-012800 ENTRY 'COOKIEACCEPT'.
-012900   CALL 'cobdom_style' USING 'cookieDiv', 'display', 'none'.
-013000   CALL 'cobdom_set_cookie' USING 'y', 'allowCookies' .
-013100   MOVE 'y' TO WS-COOKIE-ALLOWED.
-013200   GOBACK.
-013300 COOKIEDENY SECTION.
-013400 ENTRY 'COOKIEDENY'.
-013500   CALL 'cobdom_style' USING 'cookieDiv', 'display', 'none'.
-013600   MOVE 'n' TO WS-COOKIE-ALLOWED.
-013700   GOBACK.
-013800 SETPERCENTCOBOL SECTION.
-013900 ENTRY 'SETPERCENTCOBOL' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
-014000   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO WS-PERCENT-COBOL.
-014100   CALL 'cobdom_inner_html' USING 'percentCobol',
-014200     WS-PERCENT-COBOL.
-014300   DISPLAY 'Currently this website is written in ' 
-014400     WS-PERCENT-COBOL '% COBOL.'.
-014500   GOBACK.
-014600 SETLANG SECTION.
-014700 ENTRY 'SETLANG' USING LS-LANG-CHOICE.
-014800   if WS-LANG-SELECT-TOGGLE = 0 THEN
-014900     MOVE 1 TO WS-LANG-SELECT-TOGGLE
-015000     IF WS-LANG = 'us' THEN
-015100       CALL 'cobdom_style' USING 'langES', 'display', 'inline'
-015200     ELSE
-015300       CALL 'cobdom_style' USING 'langUS', 'display', 'inline'
-015400     END-IF
-015500   ELSE
-015600     MOVE 0 TO WS-LANG-SELECT-TOGGLE
-015700     IF WS-COOKIE-ALLOWED = 'y' THEN
-015800       IF LS-LANG-CHOICE = 'us' THEN
-015900         CALL 'cobdom_set_cookie' USING 'us', 'lang'
-016000         MOVE 'us' TO WS-LANG
-016100       ELSE
-016200         CALL 'cobdom_set_cookie' USING 'es', 'lang'
-016300         MOVE 'es' TO WS-LANG
-016400       END-IF
-016500       PERFORM SET-ACTIVE-FLAG
-016600     ELSE
-016700       MOVE LS-LANG-CHOICE TO WS-LANG
-016800       PERFORM SET-ACTIVE-FLAG 
-016900     END-IF
-017000   END-IF.
-017100   GOBACK.
-017200 SETLANGUS SECTION.
-017300 ENTRY 'SETLANGUS'.
-017400   CALL 'SETLANG' USING 'us'.
-017500   GOBACK.
-017600 SETLANGES SECTION.
-017700 ENTRY 'SETLANGES'.
-017800   CALL 'SETLANG' USING 'es'.
-017900   GOBACK.
+004900   ELSE
+005000     CALL 'cobdom_style' USING 'langUS', 'display', 'none'
+005100   END-IF.
+005200   CONTINUE.
+005300 BUILD-MENUBAR.
+005400   CALL 'cobdom_create_element' USING 'menuDiv', 'div'.
+005500   CALL 'cobdom_style' USING 'menuDiv', 'position', 'fixed'.
+005600   CALL 'cobdom_style' USING 'menuDiv', 'display', 'flex'.
+005700   CALL 'cobdom_style' USING 'menuDiv', 'justifyContent', 
+005800     'space-between'.
+005900   CALL 'cobdom_style' USING 'menuDiv', 'top', '0'.
+006000   CALL 'cobdom_style' USING 'menuDiv', 'left', '0'.
+006100   CALL 'cobdom_style' USING 'menuDiv', 'width', '100%'.
+006200   CALL 'cobdom_style' USING 'menuDiv', 'backgroundColor',
+006300     '#919191'.
+006400   CALL 'cobdom_inner_html' USING 'menuDiv', 'Menu'.
+006500   CALL 'cobdom_append_child' USING 'menuDiv', 'body'.
+006600*Setup language selector
+006700   CALL 'cobdom_create_element' USING 'langSelector', 'span'.
+006800   CALL 'cobdom_style' USING 'langSelector', 'marginLeft', 'auto'.
+006900   CALL 'cobdom_create_element' USING 'langUS', 'img'.
+007000   CALL 'cobdom_create_element' USING 'langES', 'img'.
+007100   CALL 'cobdom_src' USING 'langUS', '/res/icons/us.svg'.
+007200   CALL 'cobdom_style' USING 'langUS', 'width', '3rem'.
+007300   CALL 'cobdom_style' USING 'langUS', 'height', '3rem'.
+007400   CALL 'cobdom_src' USING 'langES', '/res/icons/es.svg'.
+007500   CALL 'cobdom_style' USING 'langES', 'width', '3rem'.
+007600   CALL 'cobdom_style' USING 'langES', 'height', '3rem'.
+007700   CALL 'cobdom_append_child' USING 'langUS', 'langSelector'.
+007800   CALL 'cobdom_add_event_listener' USING 'langUS', 'click', 
+007900     'SETLANGUS'.
+008000   CALL 'cobdom_append_child' USING 'langES', 'langSelector'.
+008100   CALL 'cobdom_add_event_listener' USING 'langES', 'click', 
+008200     'SETLANGES'.
+008300   CALL 'cobdom_append_child' USING 'langSelector', 'menuDiv'.
+008400   CONTINUE.
+008500 LANG-CHECK.
+008600   CALL 'cobdom_get_cookie' USING BY REFERENCE WS-LANG,
+008700     'lang'.
+008800   IF WS-LANG = WS-NULL-BYTE THEN
+008900     CALL 'cobdom_set_cookie' USING 'us', 'lang'
+009100     MOVE 'us' TO WS-LANG
+009100   END-IF.
+009200   PERFORM SET-ACTIVE-FLAG.
+009300   CONTINUE.
+009400 COOKIE-ASK.
+009500   CALL 'cobdom_create_element' USING 'cookieDiv', 'div'.
+009600   CALL 'cobdom_style' USING 'cookieDiv', 'position', 'fixed'.
+009700   CALL 'cobdom_style' USING 'cookieDiv', 'bottom', '0'.
+009800   CALL 'cobdom_style' USING 'cookieDiv', 'left', '0'.
+009900   CALL 'cobdom_style' USING 'cookieDiv', 'width', '100%'.
+010000   CALL 'cobdom_style' USING 'cookieDiv', 'backgroundColor', 
+010100     '#00ff00'.
+010200   CALL 'cobdom_style' USING 'cookieDiv', 'textAlign', 
+010300     'center'.
+010400   CALL 'cobdom_inner_html' USING 'cookieDiv','Would you like to a
+010500-'llow cookies to store your preferences such as language?&nbsp;'.
+010600   CALL 'cobdom_create_element' USING 'cookieYes', 'span'.
+010700   CALL 'cobdom_set_class' USING 'cookieYes', 'cookieButton'.
+010800   CALL 'cobdom_inner_html' USING 'cookieYes', 'Yes&nbsp;'.
+010900   CALL 'cobdom_create_element' USING 'cookieNo', 'span'.
+011000   CALL 'cobdom_set_class' USING 'cookieNo', 'cookieButton'.
+011100   CALL 'cobdom_inner_html' USING 'cookieNo', 'No'.
+011200   CALL 'cobdom_add_event_listener' USING 'cookieYes', 'click',
+011300     'COOKIEACCEPT'.
+011400   CALL 'cobdom_add_event_listener' USING 'cookieNo', 'click',
+011500     'COOKIEDENY'.
+011600   CALL 'cobdom_append_child' USING 'cookieYes', 'cookieDiv'.
+011700   CALL 'cobdom_append_child' USING 'cookieNo', 'cookieDiv'.
+011800   CALL 'cobdom_append_child' USING 'cookieDiv', 'body'.
+011900*Note this must be called after the elements are added to the
+012000*document because it must search for them.
+012100   CALL 'cobdom_class_style' USING 'cookieButton', 
+012200     'backgroundColor', '#ff0000'.
+012300   CONTINUE.
+012400 COOKIEACCEPT SECTION.
+012500 ENTRY 'COOKIEACCEPT'.
+012600   CALL 'cobdom_style' USING 'cookieDiv', 'display', 'none'.
+012700   CALL 'cobdom_set_cookie' USING 'y', 'allowCookies' .
+012800   MOVE 'y' TO WS-COOKIE-ALLOWED.
+012900   GOBACK.
+013000 COOKIEDENY SECTION.
+013100 ENTRY 'COOKIEDENY'.
+013200   CALL 'cobdom_style' USING 'cookieDiv', 'display', 'none'.
+013300   MOVE 'n' TO WS-COOKIE-ALLOWED.
+013400   GOBACK.
+013500 SETPERCENTCOBOL SECTION.
+013600 ENTRY 'SETPERCENTCOBOL' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
+013700   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO WS-PERCENT-COBOL.
+013800   CALL 'cobdom_inner_html' USING 'percentCobol',
+013900     WS-PERCENT-COBOL.
+014000   DISPLAY 'Currently this website is written in ' 
+014100     WS-PERCENT-COBOL '% COBOL.'.
+014200   GOBACK.
+014300 SETLANG SECTION.
+014400 ENTRY 'SETLANG' USING LS-LANG-CHOICE.
+014500   if WS-LANG-SELECT-TOGGLE = 0 THEN
+014600     MOVE 1 TO WS-LANG-SELECT-TOGGLE
+014700     IF WS-LANG = 'us' THEN
+014800       CALL 'cobdom_style' USING 'langES', 'display', 'inline'
+014900     ELSE
+015000       CALL 'cobdom_style' USING 'langUS', 'display', 'inline'
+015100     END-IF
+015200   ELSE
+015300     MOVE 0 TO WS-LANG-SELECT-TOGGLE
+015400     IF WS-COOKIE-ALLOWED = 'y' THEN
+015500       IF LS-LANG-CHOICE = 'us' THEN
+015600         CALL 'cobdom_set_cookie' USING 'us', 'lang'
+015700         MOVE 'us' TO WS-LANG
+015800       ELSE
+015900         CALL 'cobdom_set_cookie' USING 'es', 'lang'
+016000         MOVE 'es' TO WS-LANG
+016100       END-IF
+016200       PERFORM SET-ACTIVE-FLAG
+016300     ELSE
+016400       MOVE LS-LANG-CHOICE TO WS-LANG
+016500       PERFORM SET-ACTIVE-FLAG 
+016600     END-IF
+016700   END-IF.
+016800   GOBACK.
+016900 SETLANGUS SECTION.
+017000 ENTRY 'SETLANGUS'.
+017100   CALL 'SETLANG' USING 'us'.
+017200   GOBACK.
+017300 SETLANGES SECTION.
+017400 ENTRY 'SETLANGES'.
+017500   CALL 'SETLANG' USING 'es'.
+017600   GOBACK.
