@@ -1,7 +1,13 @@
 SRC_DIR := ./src
 BUILD_DIR := ./build
-COB_EXPORT_FLAGS = -K cobdom_add_event_listener -K cobdom_append_child -K cobdom_class_style -K cobdom_clear_interval -K cobdom_clear_timeout -K cobdom_create_element -K cobdom_eval -K cobdom_fetch -K cobdom_font_face -K cobdom_get_cookie -K cobdom_href -K cobdom_inner_html -K cobdom_remove_child -K cobdom_remove_event_listener -K cobdom_scroll_into_view -K cobdom_set_class -K cobdom_set_cookie -K cobdom_set_interval -K cobdom_set_timeout -K cobdom_src -K cobdom_string -K cobdom_style -K cobdom_test_string 
 #These are all the functions your main program wants to call. Right now it is set to every function defined by CobDOMinate.
+COBOL_CALLED = cobdom_add_event_listener cobdom_append_child cobdom_class_style cobdom_clear_interval cobdom_clear_timeout cobdom_create_element cobdom_eval cobdom_fetch cobdom_font_face cobdom_get_cookie cobdom_href cobdom_inner_html cobdom_remove_child cobdom_remove_event_listener cobdom_scroll_into_view cobdom_set_class cobdom_set_cookie cobdom_set_interval cobdom_set_timeout cobdom_src cobdom_string cobdom_style cobdom_test_string 
+COBOL_CALLED_COBC = $(foreach n,$(COBOL_CALLED),-K $(n))
+#These are all the functions your main program wants to expose.
+COBOL_EXPORTS = COOKIEACCEPT COOKIEDENY SETPERCENTCOBOL SETLANG SETLANGUS SETLANGES WINDOWCHANGE SHAPEPAGE FONTLOADED MENUTOGGLE 
+COBOL_EXPORTS_COBC = $(foreach n,$(COBOL_EXPORTS),-K $(n))
+#Your COBOL entrypoint is added here
+COBOL_EXPORTS_EMCC = _MAIN,$(shell printf "_%s\n" $(COBOL_EXPORTS) | paste -sd, -)
 
 all: $(BUILD_DIR)/web/main.js $(BUILD_DIR)/web
 	rm res/percent.txt
@@ -14,10 +20,10 @@ $(BUILD_DIR)/web: $(BUILD_DIR)
 	mkdir -p $(BUILD_DIR)/web
 
 $(BUILD_DIR)/main.c: $(BUILD_DIR)
-	cobc -C -o $@ $(SRC_DIR)/main.cob $(COB_EXPORT_FLAGS) -K COOKIEACCEPT -K COOKIEDENY -K SETPERCENTCOBOL -K SETLANG -K SETLANGUS -K SETLANGES -K WINDOWCHANGE -K SHAPEPAGE -K FONTLOADED -K MENUTOGGLE
+	cobc -C -o $@ $(SRC_DIR)/main.cob $(COBOL_CALLED_COBC) $(COBOL_EXPORTS_COBC)
 
 $(BUILD_DIR)/web/main.js: $(BUILD_DIR)/main.c $(BUILD_DIR)/web
-	emcc -o $@ $< -lgmp -lcob -lcobdom -s EXPORTED_FUNCTIONS=_malloc,_free,_cob_init,_MAIN,_COOKIEACCEPT,_COOKIEDENY,_SETPERCENTCOBOL,_SETLANG,_SETLANGUS,_SETLANGES,_WINDOWCHANGE,_SHAPEPAGE,_FONTLOADED,_MENUTOGGLE -s EXPORTED_RUNTIME_METHODS=ccall,cwrap,HEAP8 -Wno-deprecated-non-prototype
+	emcc -o $@ $< -lgmp -lcob -lcobdom -s EXPORTED_FUNCTIONS=_malloc,_free,_cob_init,$(COBOL_EXPORTS_EMCC) -s EXPORTED_RUNTIME_METHODS=ccall,cwrap,HEAP8 -Wno-deprecated-non-prototype
 
 clean:
 	rm -rf $(BUILD_DIR)
